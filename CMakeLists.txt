@@ -6,36 +6,39 @@ cmake_minimum_required(VERSION 3.5.2)
 
 project(flutter_wayland)
 
-set(FLUTTER_ENGINE_SHA b9523318caa1a99ffde8adaf331212eb879cabc9)
+set(FLUTTER_EXFILE_BASE "https://github.com/pub10cloud/flutter_wayland/releases/download/0.1/")
 
-set(FLUTTER_EMBEDDER_ARTIFACTS_ZIP ${CMAKE_BINARY_DIR}/flutter_embedder_${FLUTTER_ENGINE_SHA}.zip)
-set(FLUTTER_ARTIFACTS_ZIP          ${CMAKE_BINARY_DIR}/flutter_artifact_${FLUTTER_ENGINE_SHA}.zip)
-set(FLUTTER_BUCKET_BASE "https://storage.googleapis.com/flutter_infra/flutter")
+set(FLUTTER_ENGINE ${CMAKE_BINARY_DIR}/asset_bundle.tar.gz)
+set(FLUTTER_ASSET  ${CMAKE_BINARY_DIR}/engine.tar.gz)
 
 ## Download and setup the Flutter Engine.
-#if(NOT EXISTS ${FLUTTER_EMBEDDER_ARTIFACTS_ZIP})
-#  file(DOWNLOAD
-#    ${FLUTTER_BUCKET_BASE}/${FLUTTER_ENGINE_SHA}/linux-x64/linux-x64-embedder
-#    ${FLUTTER_EMBEDDER_ARTIFACTS_ZIP}
-#    SHOW_PROGRESS
-#  )
-#  execute_process(
-#    COMMAND ${CMAKE_COMMAND} -E tar xzf ${FLUTTER_EMBEDDER_ARTIFACTS_ZIP}
-#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-#  )
-#endif()
+if(NOT EXISTS ${FLUTTER_ENGINE})
+  file(DOWNLOAD
+    ${FLUTTER_EXFILE_BASE}/engine.tar.gz
+    ${FLUTTER_ENGINE}
+    SHOW_PROGRESS
+  )
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E tar xzf ${FLUTTER_ENGINE}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
+  execute_process(
+    COMMAND mv engine/* ./
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
+endif()
 
-#if(NOT EXISTS ${FLUTTER_ARTIFACTS_ZIP})
-#  file(DOWNLOAD
-#    ${FLUTTER_BUCKET_BASE}/${FLUTTER_ENGINE_SHA}/linux-x64/artifacts.zip
-#    ${FLUTTER_ARTIFACTS_ZIP}
-#    SHOW_PROGRESS
-#  )
-#  execute_process(
-#    COMMAND ${CMAKE_COMMAND} -E tar xzf ${FLUTTER_ARTIFACTS_ZIP}
-#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-#  )
-#endif()
+if(NOT EXISTS ${FLUTTER_ASSET})
+  file(DOWNLOAD
+    ${FLUTTER_EXFILE_BASE}/asset_bundle.tar.gz
+    ${FLUTTER_ASSET}
+    SHOW_PROGRESS
+  )
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E tar xzf ${FLUTTER_ASSET}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
+endif()
 
 find_package(PkgConfig)
 pkg_check_modules(WAYLAND_CLIENT REQUIRED wayland-client)
@@ -49,7 +52,7 @@ file(GLOB_RECURSE FLUTTER_WAYLAND_SRC
   "src/*.h"
 )
 
-link_directories(${CMAKE_BINARY_DIR})
+link_directories(${CMAKE_BINARY_DIR}/engine)
 
 add_executable(flutter_wayland ${FLUTTER_WAYLAND_SRC})
 
@@ -66,5 +69,5 @@ target_include_directories(flutter_wayland
   ${WAYLAND_CLIENT_INCLUDE_DIRS}
   ${WAYLAND_EGL_INCLUDE_DIRS}
   ${EGL_INCLUDE_DIRS}
-  ${CMAKE_BINARY_DIR}
+  ${CMAKE_BINARY_DIR}/engine
 )

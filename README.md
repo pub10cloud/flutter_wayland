@@ -8,26 +8,21 @@ A Flutter Embedder that talks to Wayland.
 Build Setup Instructions
 ------------------------
 
-* Install the following packages (on Debian Stretch): `weston`, `libwayland-dev`, `cmake` and `ninja`.
+* Install the following packages : `weston`, `libwayland-dev`, `cmake` and `ninja`.
 * From the source root `mkdir build` and move into the directory.
 * `cmake -G Ninja ../`. This should check you development environment for required packages, download the Flutter engine artifacts and unpack the same in the build directory.
 * `ninja` to build the embedder.
 * Run the embedder using `./flutter_wayland`. Make sure `weston` is running. See the instructions on running Flutter applications below.
 
-* external binary download [here](https://drive.google.com/file/d/1To_N5j8PHyj4dMIXekSpI5dyfImtCSCc/view?usp=sharing)
-
 ~~~
 $ git clone https://github.com/HidetoKimura/flutter_wayland.git
 $ cd flutter_wayland/
-$ tar xf external.tgz
 $ mkdir build
 $ cd build/
 $ cmake -G Ninja ..
 $ ninja
-$ cp ../external/engine/libflutter_engine.so .
-$ cp ../external/engine/icudtl.dat .
 $ weston  --width=1000 --height=800 &
-$ ./flutter_wayland ../external/asset_bundle/testbed
+$ ./flutter_wayland ./asset_bundle/testbed
 ~~~
 
 Running Flutter Applications
