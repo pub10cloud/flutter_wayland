@@ -15,7 +15,7 @@ Build Setup Instructions
 * Run the embedder using `./flutter_wayland`. Make sure `weston` is running. See the instructions on running Flutter applications below.
 
 ~~~
-$ git clone https://github.com/HidetoKimura/flutter_wayland.git
+$ git clone https://github.com/pub10cloud/flutter_wayland.git
 $ cd flutter_wayland/
 $ mkdir build
 $ cd build/
