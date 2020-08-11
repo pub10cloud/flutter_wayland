@@ -8,13 +8,13 @@ project(flutter_wayland)
 
 set(FLUTTER_EXFILE_BASE "https://github.com/pub10cloud/flutter_wayland/releases/download/0.1/")
 
-set(FLUTTER_ENGINE ${CMAKE_BINARY_DIR}/asset_bundle.tar.gz)
-set(FLUTTER_ASSET  ${CMAKE_BINARY_DIR}/engine.tar.gz)
+set(FLUTTER_ENGINE ${CMAKE_BINARY_DIR}/engine.zip)
+set(FLUTTER_ASSET  ${CMAKE_BINARY_DIR}/asset_bundle.tar.gz)
 
 ## Download and setup the Flutter Engine.
 if(NOT EXISTS ${FLUTTER_ENGINE})
   file(DOWNLOAD
-    ${FLUTTER_EXFILE_BASE}/engine.tar.gz
+    ${FLUTTER_EXFILE_BASE}/engine.zip
     ${FLUTTER_ENGINE}
     SHOW_PROGRESS
   )
@@ -48,7 +48,7 @@ file(GLOB_RECURSE FLUTTER_WAYLAND_SRC
   "src/*.h"
 )
 
-link_directories(${CMAKE_BINARY_DIR}/engine)
+link_directories(${CMAKE_BINARY_DIR})
 
 add_executable(flutter_wayland ${FLUTTER_WAYLAND_SRC})
 
@@ -65,5 +65,5 @@ target_include_directories(flutter_wayland
   ${WAYLAND_CLIENT_INCLUDE_DIRS}
   ${WAYLAND_EGL_INCLUDE_DIRS}
   ${EGL_INCLUDE_DIRS}
-  ${CMAKE_BINARY_DIR}/engine
+  ${CMAKE_BINARY_DIR}
 )
