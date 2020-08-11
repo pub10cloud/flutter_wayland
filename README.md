@@ -21,7 +21,7 @@ $ mkdir build
 $ cd build/
 $ cmake -G Ninja ..
 $ ninja
-$ weston  --width=1000 --height=800 &
+$ weston --no-config --width=1000 --height=800 &
 $ ./flutter_wayland ./asset_bundle/testbed
 ~~~
 
