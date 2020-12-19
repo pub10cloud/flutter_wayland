@@ -332,8 +332,10 @@ const wl_seat_listener WaylandDisplay::kSeatListener = {
         wl_touch_set_user_data(display->touch_, display);
         wl_touch_add_listener(display->touch_, &kTouchListener, display);
       } else if (!(caps & WL_SEAT_CAPABILITY_TOUCH) && display->touch_ != nullptr) {
-        wl_touch_destroy(display->touch_);
-        display->touch_ = nullptr;
+        // FIXME  
+        // It needs to manage multiple seat instances, and might change the whole class design.
+        // wl_touch_destroy(display->touch_);
+        // display->touch_ = nullptr;
       }
 
     },
