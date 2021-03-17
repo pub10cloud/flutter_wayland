@@ -3,13 +3,14 @@
 // found in the LICENSE file.
 
 #include <stdlib.h>
-
+#include <unistd.h>
 #include <string>
 #include <vector>
 
 #include "flutter_application.h"
 #include "utils.h"
 #include "wayland_display.h"
+#include "wayland_event_loop.h"
 
 namespace flutter {
 
@@ -83,7 +84,12 @@ static bool Main(std::vector<std::string> args) {
     return false;
   }
 
-  display.Run();
+  // display.Run();
+  // std::chrono::nanoseconds wait_duration = std::chrono::nanoseconds::max();
+  std::chrono::nanoseconds wait_duration = std::chrono::milliseconds(0);
+  while (display.IsValid()) {
+      application.event_loop_->WaitForEvents(wait_duration);
+  }
 
   return true;
 }
