@@ -439,6 +439,10 @@ bool WaylandDisplay::IsValid() const {
   return valid_;
 }
 
+wl_display* WaylandDisplay::getDisplay() {
+  return display_;
+}
+
 bool WaylandDisplay::Run() {
   if (!valid_) {
     FLWAY_ERROR << "Could not run an invalid display." << std::endl;

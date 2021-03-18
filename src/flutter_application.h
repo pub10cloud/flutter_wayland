@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "macros.h"
+#include "event_loop.h"
 
 namespace flutter {
 
@@ -40,6 +41,7 @@ class FlutterApplication {
                      RenderDelegate& render_delegate);
 
   ~FlutterApplication();
+  std::unique_ptr<flutter::EventLoop> event_loop_;
 
   bool IsValid() const;
 

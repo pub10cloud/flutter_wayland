@@ -12,6 +12,8 @@
 #include <vector>
 
 #include "utils.h"
+#include "event_loop.h"
+#include "wayland_event_loop.h"
 
 namespace flutter {
 
@@ -37,6 +39,24 @@ static std::string GetICUDataPath() {
   return icu_path;
 }
 
+// Populates |task_runner| with a description that uses |engine_state|'s event
+// loop to run tasks.
+static void ConfigurePlatformTaskRunner(
+    FlutterTaskRunnerDescription* task_runner,
+    FlutterApplication * state) {
+  task_runner->struct_size = sizeof(FlutterTaskRunnerDescription);
+  task_runner->user_data = state;
+  task_runner->runs_task_on_current_thread_callback = [](void* state) -> bool {
+    return reinterpret_cast<FlutterApplication*>(state)
+      ->event_loop_->RunsTasksOnCurrentThread();
+  };
+  task_runner->post_task_callback =
+      [](FlutterTask task, uint64_t target_time_nanos, void* state) -> void {
+    reinterpret_cast<FlutterApplication*>(state)->event_loop_->PostTask(
+        task, target_time_nanos);
+  };
+}
+
 FlutterApplication::FlutterApplication(
     std::string bundle_path,
     const std::vector<std::string>& command_line_args,
@@ -46,6 +66,24 @@ FlutterApplication::FlutterApplication(
     FLWAY_ERROR << "Flutter asset bundle was not valid." << std::endl;
     return;
   }
+
+  // Create an event loop for the window. It is not running yet.
+  auto event_loop = std::make_unique<flutter::WayLandEventLoop>(
+      std::this_thread::get_id(),  // main wayland thread
+      [engine = &engine_](const auto* task) {
+        if (FlutterEngineRunTask(*engine, task) != kSuccess) {
+          FLWAY_ERROR << "Could not post an engine task." << std::endl;
+        }
+        // FLWAY_ERROR << "DEBUG:excute an engine task." << std::endl;
+      }, reinterpret_cast<WaylandDisplay*>(&render_delegate));
+
+  // Configure a task runner using the event loop.
+  event_loop_ = std::move(event_loop);
+  FlutterTaskRunnerDescription platform_task_runner = {};
+  ConfigurePlatformTaskRunner(&platform_task_runner, this);
+  FlutterCustomTaskRunners task_runners = {};
+  task_runners.struct_size = sizeof(FlutterCustomTaskRunners);
+  task_runners.platform_task_runner = &platform_task_runner;
 
   FlutterRendererConfig config = {};
   config.type = kOpenGL;
@@ -100,12 +138,13 @@ FlutterApplication::FlutterApplication(
       .command_line_argc = static_cast<int>(command_line_args_c.size()),
       .command_line_argv = command_line_args_c.data(),
   };
+  args.custom_task_runners = &task_runners;
 
   FlutterEngine engine = nullptr;
   auto result = FlutterEngineRun(FLUTTER_ENGINE_VERSION, &config, &args,
                                  this /* userdata */, &engine_);
 
-  if (result != kSuccess) {
+  if (result != kSuccess || engine_ == nullptr) {
     FLWAY_ERROR << "Could not run the Flutter engine" << std::endl;
     return;
   }
