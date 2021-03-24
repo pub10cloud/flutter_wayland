@@ -67,7 +67,7 @@ void WayLandEventLoop::WayLandWaitEventsTimeout(double timeout) {
   char r_buf[12] = {0};
 
   std::chrono::duration<double> fs(timeout);
-  std::chrono::milliseconds mTimeout = std::chrono::duration_cast<std::chrono::milliseconds>(fs);
+  std::chrono::microseconds mTimeout = std::chrono::duration_cast<std::chrono::microseconds>(fs);
 
   while (display_->IsValid()) {
     wl_display_dispatch_pending(display_->getDisplay());
