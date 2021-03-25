@@ -21,7 +21,7 @@ bool EventLoop::RunsTasksOnCurrentThread() const {
   return std::this_thread::get_id() == main_thread_id_;
 }
 
-void EventLoop::WaitForEvents(std::chrono::nanoseconds max_wait) {
+void EventLoop::WaitForEvents(std::chrono::microseconds max_wait) {
   const auto now = TaskTimePoint::clock::now();
   std::vector<FlutterTask> expired_tasks;
 
@@ -63,7 +63,7 @@ void EventLoop::WaitForEvents(std::chrono::nanoseconds max_wait) {
     {
       std::lock_guard<std::mutex> lock(task_queue_mutex_);
       TaskTimePoint max_wake_timepoint =
-          max_wait == std::chrono::nanoseconds::max() ? TaskTimePoint::max()
+          max_wait == std::chrono::microseconds::max() ? TaskTimePoint::max()
                                                       : now + max_wait;
       TaskTimePoint next_event_timepoint = task_queue_.empty()
                                           ? TaskTimePoint::max()
@@ -79,7 +79,7 @@ EventLoop::TaskTimePoint EventLoop::TimePointFromFlutterTime(
   const auto now = TaskTimePoint::clock::now();
   const int64_t flutter_duration =
       flutter_target_time_nanos - FlutterEngineGetCurrentTime();
-  return now + std::chrono::nanoseconds(flutter_duration);
+  return now + std::chrono::microseconds(flutter_duration);
 }
 
 void EventLoop::PostTask(FlutterTask flutter_task,

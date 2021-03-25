@@ -40,7 +40,7 @@ class EventLoop {
   // timeout should only be used when events not managed by this loop need to be
   // processed in a polling manner.
   void WaitForEvents(
-      std::chrono::nanoseconds max_wait = std::chrono::nanoseconds::max());
+      std::chrono::microseconds max_wait = std::chrono::microseconds::max());
 
   // Posts a Flutter engine task to the event loop for delayed execution.
   void PostTask(FlutterTask flutter_task, uint64_t flutter_target_time_nanos);
