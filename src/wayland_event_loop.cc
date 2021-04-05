@@ -66,7 +66,7 @@ void WayLandEventLoop::WayLandWaitEventsTimeout(double timeout) {
   pollfd[1].events = POLLIN ;
   char r_buf[12] = {0};
 
-  std::chrono::duration<double> fs(timeout);
+  std::chrono::duration<double> fs(std::abs(timeout)*1000);
   std::chrono::milliseconds mTimeout = std::chrono::duration_cast<std::chrono::milliseconds>(fs);
 
   while (display_->IsValid()) {
@@ -76,7 +76,7 @@ void WayLandEventLoop::WayLandWaitEventsTimeout(double timeout) {
       break;
     }
 
-    count = poll(pollfd, 2, timeout == 0 ? -1 : mTimeout.count());
+	count = poll(pollfd, 2, timeout <= 0 ? 0 : mTimeout.count());
     if (count < 0 && errno != EINTR) {
       FLWAY_ERROR << "poll returned an error." << errno;
       break;
