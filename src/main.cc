@@ -85,8 +85,8 @@ static bool Main(std::vector<std::string> args) {
   }
 
   // display.Run();
-  // std::chrono::nanoseconds wait_duration = std::chrono::nanoseconds::max();
-  std::chrono::microseconds wait_duration = std::chrono::microseconds(0);
+  // std::chrono::nanoseconds wait_duration = std::chrono::microseconds::max();
+  std::chrono::microseconds wait_duration = std::chrono::microseconds(1000);
   while (display.IsValid()) {
       application.event_loop_->WaitForEvents(wait_duration);
   }
